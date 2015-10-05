@@ -105,7 +105,47 @@ function computeDistanceMatrix(zs,nb_users)
 	end
 	return(matrix)
 end
-			
+
+--- Compute the average precision over a cascade given a distanceMatrix
+function computeAveragePrecision(cascade,size_cascade,distanceMatrix)
+  local idx_source=cascade[1]
+  local liste={}
+  for u=1,distanceMatrix:size(1) do
+    liste[u]={}
+    liste[u].user=u
+    liste[u].distance=distanceMatrix[idx_source][u]
+  end
+  for i=1,size_cascade do
+    liste[cascade[i]].relevant=true
+  end
+  
+  function compare(a,b)
+    return(a.distance<b.distance)
+  end
+  table.sort(liste,compare)
+  
+  local nb_positive=0
+  local rank=1
+  local avgp=0
+  while(nb_positive<size_cascade) do
+    local elt=liste[rank]
+    if(elt.relevant) then nb_positive=nb_positive+1; local pre=nb_positive/rank; avgp=avgp+pre end
+    rank=rank+1
+  end
+  avgp=avgp/size_cascade
+  return(avgp)  
+end
+  
+  -- Compute the average precision over a cascade given a distanceMatrix
+function computeMAP(cascades,size_cascades,distanceMatrix)
+  local map=0
+  for i=1,#size_cascades do
+    map=map+computeAveragePrecision(cascades[i],size_cascades[i],distanceMatrix)
+  end
+  map=map/#size_cascades
+  return map
+end
+  
 	
 
 -----------------------------------------------------------------------------------
@@ -117,11 +157,10 @@ cmd=torch.CmdLine()
 cmd:text()
 cmd:option('--training_cascades', "", 'training_cascades file')
 cmd:option('--testing_cascades', "", 'testing_cascades file')
+cmd:option('--outputFile', "", 'The outputfile where to store the embeddings of users')
 
 cmd:option('--learningRate', 0.01, 'learning rate')
-cmd:option('--minLearningRate', -1, 'learning rate when epcoh==saturateEpoch. -1 meand that the learning rate will be fixed')
 cmd:option('--maxEpoch', 1000, 'maximum number of epochs to run')
-cmd:option('--saturateEpoch', -1, 'maximum number of epochs to run; -1 mins that saturateEpoch <- maxEpoch')
 cmd:option('--evaluationEpoch', 10, 'Number of steps where evaluation is made')
 
 cmd:option('--uniform', 0.1, 'initialize parameters using a gaussian distribution')
@@ -130,8 +169,6 @@ cmd:text()
 
 local opt = cmd:parse(arg or {})
 
-if (opt.saturateEpoch==-1) then opt.saturateEpoch=opt.maxEpoch end
-if (opt.minLearningRate==-1) then opt.minLearningRate=opt.learningRate end
 print(opt)
 
 print("Building Index of users (users that appear at least one time in both train and test files")
@@ -156,31 +193,13 @@ local criterion=nn.MarginRankingCriterion(1)
 for iteration=1,opt.maxEpoch do
 	-- Evaluaton
 	if ((iteration-1)%opt.evaluationEpoch==0) then
-		local distance_matrix=computeDistanceMatrix(zs,train_cascades.nb_users)
-		
-		---For each cascade, compute the ordered list of users depending on the source
-		for idx=1,train_cascades.nb_cascades do
-			local cascade=train_cascades.cascades[idx_cascade]
-			local size_cascade=train_cascades.size_cascades[idx_cascade]
-			local user_source=cascade[1]
-			
-			local liste={}
-			for idu=1,train_cascades.nb_users do
-				liste[idu]={}
-				liste[idu].user=udi
-				liste[idu].distance=distance_matrix[user_source][idu]
-			end
-			
-			-- sort ....
-			assert(true,"To finish...")
-		end
-		
-		
-		
-		
+		local distance_matrix=computeDistanceMatrix(zs,train_cascades.nb_users)		
+    local train_map=computeMAP(train_cascades.cascades,train_cascades.size_cascades,distance_matrix)
+    print("Training MAP = "..train_map)
+    local testing_map=computeMAP(test_cascades.cascades,test_cascades.size_cascades,distance_matrix)
+    print("Testing MAP = "..testing_map)
 	end
-	
-	
+		
 	-- SGD 
 	local total_loss=0
 	for i=1,train_cascades.nb_cascades do
@@ -221,6 +240,19 @@ for iteration=1,opt.maxEpoch do
   print("Average loss at iteration "..iteration .." is "..total_loss)
 end
 
+--- Save embeddings in a file
+if (opt.outputFile~="") then
+  print("Saving embeddings in "..opt.outputFile) 
+  io.output(opt.outputFile)
+  for u,idx in pairs(index_users) do
+    local emb=zs[idx]:forward(is)
+    io.write(u)
+    for j=1,emb:size(1) do
+      io.write(" "..emb[j])
+    end
+    io.write("\n")
+  end
+end
 
 
 
