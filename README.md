@@ -35,3 +35,4 @@ Contact: ludovic.denoyer@lip6.fr
 
 * Version of the model with content
 * Baseline methods
+* GPU implementation of the distance matrix computation 
