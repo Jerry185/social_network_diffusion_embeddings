@@ -3,6 +3,12 @@ The code implements the model (no content) proposed in "Learning Social Network 
 
 It is Torch 7 implementation of the model. The model aims at predicting diffusion cascades (typically in social networks)
 
+#Dependencies
+* Torch 7
+* nn
+* nngraph
+
+
 # Data format
 
 The software needs two input files: a training set of cascades and a testing set. The format of each file is the following:

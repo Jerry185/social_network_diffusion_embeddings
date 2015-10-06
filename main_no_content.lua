@@ -21,7 +21,7 @@ function buildIndex(train, test)
       local tokens=string.gmatch(line,"[^%s]+")
       for token in tokens do
         iter=string.gmatch(token,"[^,]+")
-        local user=tonumber(iter())
+        local user=iter()
         local timestamp=tonumber(iter())
         if (count[user]==nil) then count[user]=0 end
         count[user]=count[user]+1
@@ -34,7 +34,7 @@ function buildIndex(train, test)
       local tokens=string.gmatch(line,"[^%s]+")
       for token in tokens do
         iter=string.gmatch(token,"[^,]+")
-        local user=tonumber(iter())
+        local user=iter()
         local timestamp=tonumber(iter())
         if (countt[user]==nil) then countt[user]=0 end
         countt[user]=countt[user]+1
@@ -68,7 +68,7 @@ function readFromFile(filename,index_users)
     local tokens=string.gmatch(line,"[^%s]+")
     for token in tokens do
       iter=string.gmatch(token,"[^,]+")
-      local user=tonumber(iter())
+      local user=iter()
       local timestamp=tonumber(iter())
             
       if (index_users[user]~=nil) then
@@ -146,6 +146,7 @@ function computeMAP(cascades,size_cascades,distanceMatrix)
   return map
 end
   
+  
 	
 
 -----------------------------------------------------------------------------------
@@ -166,7 +167,7 @@ cmd:option('--evaluationEpoch', 10, 'Number of steps where evaluation is made')
 cmd:option('--uniform', 0.1, 'initialize parameters using a gaussian distribution')
 cmd:option('--N', 10, 'Dimension of the latent space')
 cmd:text()
-
+ 
 local opt = cmd:parse(arg or {})
 
 print(opt)
