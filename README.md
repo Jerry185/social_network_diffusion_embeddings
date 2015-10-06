@@ -25,6 +25,10 @@ Exampels of cascades are given in ''example_train_cascades'' and ''example_test_
 
 # Command line
 
+## main_no_content.lua
+
+The code learns the embeddings models over a set of train /test cascades
+
 The scripts has different arguments:
 * training_cascades: the training cascades file
 * testing_cascades: the testing cascades file
@@ -34,6 +38,13 @@ The scripts has different arguments:
 * evaluationEpoch: evry ''evaluationEpoch' iterations, the software performs a MAP evaluation of the learned embeddings over the training and testing cascades
 * uniform: the initialization range for the embeddings
 * N: the dimension of the latent space (size of the embeddings)
+* outputFile: the file where one wants to save the embeddings
+
+## main_evaluate_embeddings.lua
+
+The script evaluates the quality of the embeddings over a set of cascades using a MAP measure. 
+* embeddings: the filename of the embeddings (first column is user, then vector)
+* cascades: the filename of the cascades
 
 Contact: ludovic.denoyer@lip6.fr
 
