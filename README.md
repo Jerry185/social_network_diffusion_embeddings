@@ -1,12 +1,10 @@
 
-The code implements the model (no content) proposed in "Learning Social Network Embeddings for Predicting Information Diffusion - Simon Bourigault, Cedric Lagnier, Sylvain Lamprier, Ludovic Denoyer, Patrick Gallinari, Université Pierre et Marie Curie" published at WSDM 2014. This code is not the one that has been used in the experiments of the article and is provided as if, without using it for large set of experiments...
+The code implements the model (no content) proposed in "Learning Social Network Embeddings for Predicting Information Diffusion - Simon Bourigault, Cedric Lagnier, Sylvain Lamprier, Ludovic Denoyer, Patrick Gallinari, Université Pierre et Marie Curie" published at WSDM 2014. This code is not the one that has been used in the experiments of the article and is provided as if. It has not been tested on large datasets.
 
-It is Torch 7 implementation of the model. The model aims at predicting diffusion cascades (typically in social networks)
+It is a Torch 7 implementation of the model. The model aims at predicting diffusion cascades (typically in social networks)
 
 #Dependencies
-* Torch 7
-* nn
-* nngraph
+* Torch 7 : modules nn, nngraph and logroll
 
 
 # Data format
@@ -21,13 +19,13 @@ For example, if a twitter message has been posted by John, and the retweeted by 
 
 Only users that appear at least once in both the train and test files are kept.
 
-Exampels of cascades are given in ''example_train_cascades'' and ''example_test_cascades''
+Examples of cascades are given in ''example_train_cascades'' and ''example_test_cascades''
 
 # Command line
 
 ## main_no_content.lua
 
-The code learns the embeddings models over a set of train /test cascades
+The code learns the embeddings models over a set of train /test cascades. 
 
 The scripts has different arguments:
 * training_cascades: the training cascades file
@@ -45,6 +43,8 @@ The scripts has different arguments:
 The script evaluates the quality of the embeddings over a set of cascades using a MAP measure. 
 * embeddings: the filename of the embeddings (first column is user, then vector)
 * cascades: the filename of the cascades
+
+NB: The computation of the MAP needs to compute the distance matrix between all users which can take (a lot of) time. 
 
 Contact: ludovic.denoyer@lip6.fr
 
